@@ -60,3 +60,18 @@ def test_agent(apache_status, cfg, response, monkeypatch, capsys):
     captured = capsys.readouterr()
     assert captured.out == ("<<<apache_status:sep(124)>>>\n" + "\n".join(
         ("127.0.0.1|None||%s" % line for line in RESPONSE.split("\n"))) + "\n")
+
+
+@pytest.mark.parametrize("netstat, expected", [
+    (["Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name",
+      "tcp        0      0 127.0.0.1:60000         0.0.0.0:*               LISTEN      123456/apache2",
+      "tcp        0      0 127.0.0.1:60001         0.0.0.0:*               LISTEN      123321/java",
+      "tcp        0      0 :::60002                0.0.0.0:*               LISTEN      000000/fcgi-pm",
+      "tcp        0      0 0.0.0.0:443             0.0.0.0:*               LISTEN      000000/httpd-prefor",
+      "tcp        0      0 [::]:8010               0.0.0.0:*               LISTEN      1234/httpd2-prefork"],
+     [('http', '127.0.0.1', 60000), ('http', '[::1]', 60002), ('https', '127.0.0.1', 443), ('http', '[[::]]', 8010)])
+])
+def test_try_detect_servers(apache_status, netstat, expected, monkeypatch):
+    monkeypatch.setattr(apache_status, "get_netstat", lambda: netstat)
+    res = apache_status.try_detect_servers([443])
+    assert res == expected
