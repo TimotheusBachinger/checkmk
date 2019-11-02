@@ -192,6 +192,8 @@ $ make -C tests test-format-python
 $ make -C tests-py3 test-pylint
 $ make -C tests-py3 test-unit
 $ make -C tests-py3 test-mypy-raw
+
+$ make -C tests-shell test-shell-unit
 ```
 
 Some of these commands take several minutes, for example the command
