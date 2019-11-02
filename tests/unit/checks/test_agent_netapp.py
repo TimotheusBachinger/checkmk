@@ -14,6 +14,11 @@ pytestmark = pytest.mark.checks
         'password': 'password',
         'skip_elements': ['ctr_volumes']
     }, ['-u', 'user', '-s', 'password', '--nocounters volumes', 'address']),
+    ({
+         'username': 'user',
+         'password': 'password',
+         'skip_elements': ['']
+     }, ['-u', 'user', '-s', 'password', 'address']),
 ])
 def test_netapp_argument_parsing(check_manager, params, expected_args):
     """Tests if all required arguments are present."""
