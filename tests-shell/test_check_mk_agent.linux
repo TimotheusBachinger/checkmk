@@ -1,0 +1,58 @@
+#!/bin/bash
+
+testSectionMem_noDocker() {
+    expected="<<<mem>>>
+MemTotal:        3002604 kB
+MemFree:           90248 kB"
+    res=$(section_mem)
+    assertEquals "${expected}" "${res}" 
+}
+
+testSectionMem_Docker() {
+    IS_DOCKERIZED=1
+    expected="<<<docker_container_mem>>>
+memory.stat 
+cache 23478272
+rss 2797568
+usage_in_bytes memory.usage_in_bytes
+2681651200
+limit_in_bytes memory.limit_in_bytes 
+9223372036854771712
+MemTotal:        3002604 kB"
+    res=$(section_mem)
+    assertEquals "${expected}" "${res}" 
+}
+
+oneTimeSetUp() {
+
+    FILE_MEMORY_STAT="./FileMocks/memory.stat"
+    cat <<EOF >"${FILE_MEMORY_STAT}"
+memory.stat 
+cache 23478272
+rss 2797568
+EOF
+
+    FILE_MEMORY_USAGE="./FileMocks/memory.usage"
+    cat <<EOF >"${FILE_MEMORY_USAGE}"
+memory.usage_in_bytes
+2681651200
+EOF
+
+    FILE_MEMORY_LIMIT="./FileMocks/memory.limit"
+    cat <<EOF >"${FILE_MEMORY_LIMIT}"
+memory.limit_in_bytes 
+9223372036854771712
+EOF
+
+    FILE_MEMINFO="./FileMocks/meminfo"
+    cat <<EOF >"${FILE_MEMINFO}"
+MemTotal:        3002604 kB
+MemFree:           90248 kB
+EOF
+
+. ../agents/check_mk_agent.linux --source-only
+
+}
+
+# Load shUnit2.
+. ./shunit2/shunit2
