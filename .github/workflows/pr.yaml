@@ -37,6 +37,9 @@ jobs:
         #  more infos see: https://brandur.org/fragments/github-actions-env-vars-in-env-vars
         echo "PIP_CACHE_DIR=$HOME/.cache/pip" >> $GITHUB_ENV
         echo "PIPENV_CACHE_DIR=$HOME/.cache/pipenv" >> $GITHUB_ENV
+    - name: Set Distro Environment Variable
+      run: |
+          echo "DISTRO=$(lsb_release -is)-$(lsb_release -rs)" >> $GITHUB_ENV
     - name: Checkout Repository
       uses: actions/checkout@v3
     - name: Parse Python version from defines.make
@@ -49,12 +52,12 @@ jobs:
     - name: Cache pip
       uses: actions/cache@v3
       with:
-        key: pip-${{ runner.os }}-${{ hashFiles('Pipfile.lock') }}
+        key: pip-${{ env.DISTRO }}-${{ hashFiles('Pipfile.lock') }}
         path: ${{ env.PIP_CACHE_DIR  }}
     - name: Cache pipenv
       uses: actions/cache@v3
       with:
-        key: pipenv-${{ runner.os }}-${{ hashFiles('Pipfile.lock') }}
+        key: pipenv-${{ env.DISTRO }}-${{ hashFiles('Pipfile.lock') }}
         path: ${{ env.PIPENV_CACHE_DIR  }}
     - name: Setup Environment
       run: |
